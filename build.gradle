@@ -1,0 +1,70 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'https://plugins.gradle.org/m2/'}
+        maven { url 'https://www.dcm4che.org/maven2/'}
+    }
+    dependencies  {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.2.5.RELEASE'
+        classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.22.1')
+    }
+}
+
+allprojects {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    
+}
+
+subprojects {
+    group = 'com.zengc'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+        maven { url 'http://akmasoft.com/nexus/content/repositories/releases/'}
+        maven { url 'https://www.dcm4che.org/maven2/'}
+        maven { url 'http://maven.oschina.net/content/groups/public/'}
+    }
+    
+    ext {
+        springcloudVersion = '2.2.5.RELEASE'
+//        springcloudAlibabaVersion = '2.2.0.RELEASE'
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.palantir.docker'
+
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allJava
+    }
+
+    jar {
+        enabled = true
+    }
+    
+    bootJar {
+        mainClassName = 'com.zengc.ZCApplication'
+    }
+
+    task unpack(type: Copy) {
+        dependsOn bootJar
+        from(zipTree(tasks.bootJar.outputs.files.singleFile))
+        into('build/dependency')
+    }
+    docker {
+        dockerfile rootProject.file('Dockerfile')
+        name 'zc/' + project.name
+        copySpec.from(tasks.unpack.outputs).into('dependency')
+        buildArgs(['DEPENDENCY': 'dependency'])
+    }
+   
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+}

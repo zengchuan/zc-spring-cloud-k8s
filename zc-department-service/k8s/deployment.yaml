@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: zc-server
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zc-department-service-deploy
+  namespace: zc-server
+spec:
+  selector:
+    matchLabels:
+      app: zc-department-service-deploy
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: zc-department-service-deploy
+    spec:
+      containers:
+        - name: zc-department-service-ctn
+          image: 192.168.56.220:5000/zc-employee-service:202009241705
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 11221
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zc-department-service
+  namespace: zc-server
+spec:
+  ports:
+    - port: 11221
+      targetPort: 11221
+  selector:
+    app: zc-department-service-deploy
+  type: ClusterIP
+

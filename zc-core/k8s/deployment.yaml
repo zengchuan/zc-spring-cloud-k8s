@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  backend:
+    serviceName: default-http-backend
+    servicePort: 80
+  rules:
+    - http:
+        paths:
+          - path: /zc-employee-service
+            backend:
+              serviceName: zc-employee-service
+              servicePort: 11220
+          - path: /zc-department-service
+            backend:
+              serviceName: zc-department-service
+              servicePort: 11221
+

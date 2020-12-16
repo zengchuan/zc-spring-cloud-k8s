@@ -1,0 +1,23 @@
+server:
+  port: 11220
+  servlet:
+    context-path: /zc-employee-service
+spring:
+  profiles:
+    active: ${spring.profile:dev}
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: zc-employee-service
+
+# 开启断点访问监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+    httptrace: true
+    heapdump: true
